@@ -17,11 +17,7 @@ class User extends Authenticatable
 
     public $timestamps = false; // Karena tidak pakai default timestamps Laravel
 
-    protected $fillable = [
-        'email', 'name','phone','role', 'image', 'password',
-        'status', 'reason', 'blocked_date', 'blocked_by',
-        'created_by', 'created_at','updated_at', 'deleted', 'deleted_by', 'deleted_date'
-    ];
+    protected $fillable = ['email', 'name', 'phone', 'role', 'id_vector', 'id_category', 'id_riwayat_pelatihan', 'born_date', 'education_status', 'gender', 'image', 'password', 'status', 'reason', 'blocked_date', 'blocked_by', 'created_by', 'created_at', 'updated_at', 'deleted', 'deleted_by', 'deleted_date'];
 
     protected $hidden = ['password'];
 
@@ -30,9 +26,8 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($password);
     }
 
-     public function userVectors()
+    public function userVectors()
     {
-        return $this->hasMany(UserVector::class,'id_user','id_user');
+        return $this->hasMany(UserVector::class, 'id_user', 'id_user');
     }
-
 }

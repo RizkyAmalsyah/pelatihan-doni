@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Sosmed;
+use App\Models\Training;
 use App\Models\WebPhone;
 use App\Models\WebEmail;
 use App\Models\Vector;
@@ -63,6 +64,12 @@ class AppServiceProvider extends ServiceProvider
             $vector = Vector::where('status', 'Y')->get();
             View::share('vector', $vector);
             $this->app->singleton('vector', fn () => $vector);
+        }
+
+        if (Schema::hasTable('trainings')) {
+            $training = Training::where('status', 'Y')->get();
+            View::share('training', $training);
+            $this->app->singleton('training', fn () => $training);
         }
     }
 }
