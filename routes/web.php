@@ -140,6 +140,7 @@ Route::middleware(DashboardRoleAccess::class)->group(function () {
         Route::post('/master/training/insert', 'insert_training')->name('insert.training');
         Route::post('/single_training', 'single_training')->name('single.training');
         Route::post('/modal_register','modal_register')->name('modal.register');
+        Route::get('/download_register', 'download_register')->name('download.register');
         Route::post('/delete_regis','delete_regis')->name('delete.regis');
         
         
