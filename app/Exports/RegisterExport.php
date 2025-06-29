@@ -9,31 +9,47 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class RegisterExport implements FromCollection, WithHeadings
 {
-  protected $id;
+    protected $id;
 
-  public function __construct($id)
-  {
-    $this->id = $id;
-  }
+    public function __construct($id)
+    {
+        $this->id = $id;
+    }
 
-  public function collection()
-  {
-    return RegisTraining::with('user')
-      ->where('id_training', $this->id)
-      ->where('approved', 'Y')
-      ->get()
-      ->map(function ($item, $key) {
+    public function collection()
+    {
+        return RegisTraining::with(['user', 'training.category', 'user.userVectors.vector'])
+            ->where('id_training', $this->id)
+            ->where('approved', 'Y')
+            ->get()
+            ->map(function ($item, $key) {
+                $user = $item->user;
+                return [
+                    'Nama' => $user->name,
+                    'Jenis Kelamin' => $user->gender ?? '-',
+                    'Tanggal Lahir' => $user->born_date ? Carbon::parse($user->born_date)->format('d-m-Y') : '-',
+                    'Status Pendidikan' => $user->education_status ?? '-',
+                    'No HP' => $user->phone ?? '-',
+                    'Email' => $user->email,
+                    'Nama Program Pelatihan' => optional($item->training)->title ?? '-',
+                    'Kategori Pelatihan' => optional(optional($item->training)->category)->name ?? '-',
+                    'Minat' => optional($user->vector)->name ?? '-',
+                ];
+            });
+    }
+
+    public function headings(): array
+    {
         return [
-          'No' => $key + 1,
-          'Nama' => $item->user->name,
-          'Email' => $item->user->email,
-          'tanggal_daftar' => Carbon::parse($item->created_at)->format('d-m-Y'),
+            'Nama',
+            'Jenis Kelamin',
+            'Tanggal Lahir',
+            'Status Pendidikan',
+            'No HP',
+            'Email',
+            'Nama Program Pelatihan',
+            'Kategori Pelatihan',
+            'Minat',
         ];
-      });
-  }
-
-  public function headings(): array
-  {
-    return ['No', 'Nama', 'Email', 'Tanggal Daftar'];
-  }
+    }
 }

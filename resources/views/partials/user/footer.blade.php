@@ -267,6 +267,7 @@
                                 <div class="row w-100">
                                     <select name="id_riwayat_pelatihan" id="riwayat_pelatihan" class="form-select">
                                         <option value="">-- Pilih salah satu --</option>
+                                        <option value="">Belum Pernah Mengikuti Pelatihan</option>
                                         @foreach ($training as $row)
                                             <option value="{{ $row->id_training }}">{{ $row->title }}
                                             </option>

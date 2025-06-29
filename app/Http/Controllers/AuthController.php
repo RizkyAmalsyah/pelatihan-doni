@@ -169,7 +169,6 @@ class AuthController extends Controller
       return redirect()->route('home');
     }
 
-    Log::info($request->input());
     $arrVar = [
       'name' => 'Nama',
       'born_date' => 'Tanggal Lahir',
@@ -187,9 +186,12 @@ class AuthController extends Controller
     $post = [];
 
     // Validasi input satu per satu (sesuai dengan logika CI3-mu)
+    $optionalFields = ['id_riwayat_pelatihan'];
+
     foreach ($arrVar as $var => $label) {
       $$var = $request->input($var);
-      if (!$$var) {
+
+      if (!$$var && !in_array($var, $optionalFields)) {
         return response()->json([
           'status' => 500,
           'alert' => ['message' => "$label tidak boleh kosong!"],
@@ -237,6 +239,7 @@ class AuthController extends Controller
       ]);
     }
     $post['id_category'] = $this->knnPredictCategory($post);
+    $post['id_riwayat_pelatihan'] = $post['id_riwayat_pelatihan'] !== '' ? (int) $post['id_riwayat_pelatihan'] : null;
     $user = User::create($post);
 
     if ($user) {
@@ -278,18 +281,22 @@ class AuthController extends Controller
     $genderBaru = $userInput['gender'] === 'Laki-laki' ? 1 : 0;
     $eduMap = ['SMA' => 0, 'SMK' => 1, 'Mahasiswa' => 2];
     $eduBaru = $eduMap[$userInput['education_status']] ?? 0;
+    $vectorBaru = (int) $userInput['id_vector'];
+    $riwayatBaru = isset($userInput['id_riwayat_pelatihan']) ? (int) $userInput['id_riwayat_pelatihan'] : 0;
 
     foreach ($allUsers as $oldUser) {
       $umurLama = $this->getAge($oldUser->born_date);
       $genderLama = $oldUser->gender === 'Laki-laki' ? 1 : 0;
       $eduLama = $eduMap[$oldUser->education_status] ?? 0;
+      $vectorLama = (int) $oldUser->id_vector ?? 0;
+      $riwayatLama = (int) $oldUser->id_riwayat_pelatihan ?? 0;
 
       $dist = sqrt(
         pow($umurBaru - $umurLama, 2) +
           pow($genderBaru - $genderLama, 2) +
           pow($eduBaru - $eduLama, 2) +
-          pow($userInput['id_vector'] - $oldUser->id_vector, 2) +
-          pow($userInput['id_riwayat_pelatihan'] - $oldUser->id_riwayat_pelatihan, 2)
+          pow($vectorBaru - $vectorLama, 2) +
+          pow($riwayatBaru - $riwayatLama, 2)
       );
 
       $distances[] = ['distance' => $dist, 'category' => $oldUser->id_category];
