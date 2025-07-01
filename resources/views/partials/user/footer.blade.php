@@ -66,7 +66,6 @@
                     <ul class="list-unstyled  mb-0">
                         <li><a class="scrollto" href="{{ route('home') }}#home">Home</a></li>
                         <li><a class="scrollto" href="{{ route('home') }}#about">Tentang Kami</a></li>
-                        <li><a class="scrollto" href="{{ route('home') }}#review">Testimoni</a></li>
                         <li><a class="scrollto" href="{{ route('home') }}#contact">Hubungi Kami</a></li>
                     </ul>
                 </div>
