@@ -22,6 +22,7 @@ use App\Models\Training;
 use App\Models\TrainingVector;
 use App\Models\Banner;
 use App\Models\RegisTraining;
+use Illuminate\Support\Facades\Log;
 
 class TableManagement extends Controller
 {
@@ -147,20 +148,27 @@ class TableManagement extends Controller
 
       // 10) Status switch
       $checked = $item->status === 'Y' ? 'checked' : '';
-      $status = '<div class="form-check form-switch d-flex justify-content-center">'
+      $status = '<div class="form-check form-switch">'
         . '<input onchange="switching(this,event,' . $item->id_user . ')" '
-        . 'data-url="' . url('switch/users') . '" class="form-check-input" type="checkbox" '
+        . 'data-primary="id_user" '
+        . 'data-url="' . url('switch/users') . '" '
+        . 'class="form-check-input cursor-pointer focus-info" type="checkbox" role="switch" '
         . 'id="switch-' . $item->id_user . '" ' . $checked . '>'
         . '</div>';
 
+
       // 11) Actions
-      $action = '<div class="d-flex justify-content-end">'
-        . '<button class="btn btn-warning btn-sm me-1" onclick="ubah_data(this,' . $item->id_user . ')">'
-        . '<i class="ki-outline ki-pencil fs-2"></i></button>'
-        . '<button class="btn btn-danger btn-sm" onclick="hapus_data(this,event,'
-        . $item->id_user . ',\'users\',\'id_user\')">'
-        . '<i class="ki-outline ki-trash fs-2"></i></button>'
-        . '</div>';
+      $action = '<div class="d-flex justify-content-end gap-1">'
+    . '<button class="btn btn-icon btn-warning btn-sm" '
+    . 'data-image="' . image_check($item->image, 'user', 'user') . '" '
+    . 'onclick="ubah_data(this,' . $item->id_user . ')">'
+    . '<i class="ki-outline ki-pencil fs-2"></i></button>'
+    
+     . '<button type="button" onclick="hapus_data(this,event,' . $item->id_user . ',`users`,`id_user`)" '
+    . 'data-datatable="table_user" '
+    . 'class="btn btn-icon btn-danger btn-sm" title="Delete">'
+    . '<i class="ki-outline ki-trash fs-2"></i></button>'
+    . '</div>';
 
       $result[] = [
         $user,

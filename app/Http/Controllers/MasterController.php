@@ -17,6 +17,7 @@ use App\Models\Training;
 use App\Models\TrainingVector;
 use App\Models\RegisTraining;
 use App\Models\Banner;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MasterController extends Controller
@@ -114,11 +115,16 @@ class MasterController extends Controller
   public function insert_user(Request $request)
   {
     $arrVar = [
-      'name' => 'Full name',
-      'email' => 'Email address',
-      'phone' => 'Phone number',
-      'password' => 'Password',
-      'repassword' => 'Password confirmation',
+      'name' => 'Nama',
+      'born_date' => 'Tanggal Lahir',
+      'education_status' => 'Status Pendidikan',
+      'email' => 'Alamat email',
+      'phone' => 'Nomor telepon',
+      'gender' => 'Jenis Kelamin',
+      'id_vector' => 'Minat',
+      'id_riwayat_pelatihan' => 'Riwayat Pelatihan',
+      'password' => 'Kata sandi',
+      'repassword' => 'Konfirmasi kata sandi',
       'role' => 'Peran'
     ];
 
@@ -126,16 +132,24 @@ class MasterController extends Controller
     $arrAccess = [];
     $data = [];
 
-    foreach ($arrVar as $var => $value) {
+    // Validasi input satu per satu (sesuai dengan logika CI3-mu)
+    $optionalFields = ['id_riwayat_pelatihan'];
+
+    foreach ($arrVar as $var => $label) {
       $$var = $request->input($var);
-      if (!$$var) {
-        $data['required'][] = ['req_' . $var, "$value cannot be empty!"];
-        $arrAccess[] = false;
+
+      if (!$$var && !in_array($var, $optionalFields)) {
+        return response()->json([
+          'status' => 500,
+          'alert' => ['message' => "$label tidak boleh kosong!"],
+        ]);
+        $data['arrAccess'][] = false;
       } else {
-        if (!in_array($var, ['password', 'repassword'])) {
+        if (!in_array($var, ['repassword'])) {
           $post[$var] = trim($$var);
-          $arrAccess[] = true;
         }
+
+        $data['arrAccess'][] = true;
       }
     }
 
@@ -158,23 +172,33 @@ class MasterController extends Controller
     if (!filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
       return response()->json([
         'status' => 700,
-        'alert' => ['message' => 'Invalid email address!']
+        'alert' => ['message' => 'Email tidak valid! Silahkan cek dan coba lagi.']
       ]);
     }
 
     if (User::where('email', $request->email)->where('deleted', 'N')->exists()) {
       return response()->json([
         'status' => false,
-        'alert' => ['message' => 'Email address is already registered!']
+        'alert' => ['message' => 'Email yang anda masukan sudah terdaftar!']
+      ]);
+    }
+
+    if (User::where('phone', $phone)->where('deleted', 'N')->exists()) {
+      return response()->json([
+        'status' => 500,
+        'alert' =>  ['message' => 'Nomor telepon yang anda masukan sudah terdaftar!'],
       ]);
     }
 
     if ($request->password !== $request->repassword) {
       return response()->json([
         'status' => false,
-        'alert' => ['message' => 'Password confirmation does not match!']
+        'alert' => ['message' => 'Konfirmasi kata sandi salah!']
       ]);
     }
+
+    $post['id_category'] = $this->knnPredictCategory($post);
+    $post['id_riwayat_pelatihan'] = $post['id_riwayat_pelatihan'] !== '' ? (int) $post['id_riwayat_pelatihan'] : null;
 
     $prefix = config('session.prefix');
     $id_user = session($prefix . '_id_user');
@@ -205,6 +229,56 @@ class MasterController extends Controller
     }
   }
 
+  public function getAge($born_date)
+  {
+    return now()->diffInYears(Carbon::parse($born_date));
+  }
+
+  public function knnPredictCategory($userInput, $k = 3)
+  {
+    $allUsers = User::whereNotNull('id_category')->where('deleted', 'N')->get();
+
+    $distances = [];
+
+    $umurBaru = $this->getAge($userInput['born_date']);
+    $genderBaru = $userInput['gender'] === 'Laki-laki' ? 1 : 0;
+    $eduMap = ['SMA' => 0, 'SMK' => 1, 'Mahasiswa' => 2];
+    $eduBaru = $eduMap[$userInput['education_status']] ?? 0;
+    $vectorBaru = (int) $userInput['id_vector'];
+    $riwayatBaru = isset($userInput['id_riwayat_pelatihan']) ? (int) $userInput['id_riwayat_pelatihan'] : 0;
+
+    foreach ($allUsers as $oldUser) {
+      $umurLama = $this->getAge($oldUser->born_date);
+      $genderLama = $oldUser->gender === 'Laki-laki' ? 1 : 0;
+      $eduLama = $eduMap[$oldUser->education_status] ?? 0;
+      $vectorLama = (int) $oldUser->id_vector ?? 0;
+      $riwayatLama = (int) $oldUser->id_riwayat_pelatihan ?? 0;
+
+      $dist = sqrt(
+        pow($umurBaru - $umurLama, 2) +
+          pow($genderBaru - $genderLama, 2) +
+          pow($eduBaru - $eduLama, 2) +
+          pow($vectorBaru - $vectorLama, 2) +
+          pow($riwayatBaru - $riwayatLama, 2)
+      );
+
+      $distances[] = ['distance' => $dist, 'category' => $oldUser->id_category];
+    }
+
+    // Urutkan jarak terpendek
+    usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
+
+    // Ambil k tetangga terdekat
+    $topK = array_slice($distances, 0, $k);
+
+    // Hitung mayoritas kategori
+    $counts = array_count_values(array_column($topK, 'category'));
+
+    // Ambil id_category yang paling banyak muncul
+    arsort($counts);
+    return array_key_first($counts);
+  }
+
   public function update_user(Request $request)
   {
     $id = $request->id_user;
@@ -218,9 +292,14 @@ class MasterController extends Controller
     }
 
     $arrVar = [
-      'name' => 'Full name',
-      'phone' => 'Phone number',
-      'email' => 'Email address',
+      'name' => 'Nama',
+      'born_date' => 'Tanggal Lahir',
+      'education_status' => 'Status Pendidikan',
+      'email' => 'Alamat email',
+      'phone' => 'Nomor telepon',
+      'gender' => 'Jenis Kelamin',
+      'id_vector' => 'Minat',
+      'id_riwayat_pelatihan' => 'Riwayat Pelatihan',
       'role' => 'Peran'
     ];
 
@@ -228,14 +307,23 @@ class MasterController extends Controller
     $arrAccess = [];
     $data = [];
 
-    foreach ($arrVar as $var => $value) {
+    $optionalFields = ['id_riwayat_pelatihan'];
+
+    foreach ($arrVar as $var => $label) {
       $$var = $request->input($var);
-      if (!$$var) {
-        $data['required'][] = ['req_' . $var, "$value cannot be empty!"];
-        $arrAccess[] = false;
+
+      if (!$$var && !in_array($var, $optionalFields)) {
+        return response()->json([
+          'status' => 500,
+          'alert' => ['message' => "$label tidak boleh kosong!"],
+        ]);
+        $data['arrAccess'][] = false;
       } else {
-        $post[$var] = trim($$var);
-        $arrAccess[] = true;
+        if (!in_array($var, ['repassword'])) {
+          $post[$var] = trim($$var);
+        }
+
+        $data['arrAccess'][] = true;
       }
     }
 
@@ -246,14 +334,21 @@ class MasterController extends Controller
     if (!filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
       return response()->json([
         'status' => 700,
-        'alert' => ['message' => 'Invalid email address!']
+        'alert' => ['message' => 'Email tidak valid! Silahkan cek dan coba lagi.']
       ]);
     }
 
     if (User::where('email', $request->email)->where('id_user', '!=', $id)->where('deleted', 'N')->exists()) {
       return response()->json([
         'status' => false,
-        'alert' => ['message' => 'Email address is already used by another user!']
+        'alert' => ['message' => 'Email yang anda masukan sudah terdaftar!']
+      ]);
+    }
+
+    if (User::where('phone', $request->phone)->where('id_user', '!=', $id)->where('deleted', 'N')->exists()) {
+      return response()->json([
+        'status' => 500,
+        'alert' =>  ['message' => 'Nomor telepon yang anda masukan sudah terdaftar!'],
       ]);
     }
 
@@ -262,7 +357,7 @@ class MasterController extends Controller
       if ($request->password !== $request->repassword) {
         return response()->json([
           'status' => false,
-          'alert' => ['message' => 'Password confirmation does not match!']
+          'alert' => ['message' => 'Konfirmasi kata sandi salah!']
         ]);
       }
       $post['password'] = $request->password;
@@ -289,6 +384,10 @@ class MasterController extends Controller
       }
       $post['image'] = null;
     }
+
+    $post['id_category'] = $this->knnPredictCategory($post);
+    $post['id_riwayat_pelatihan'] = $post['id_riwayat_pelatihan'] !== '' ? (int) $post['id_riwayat_pelatihan'] : null;
+
 
     $page = 'user';
     if ($role == 1) {

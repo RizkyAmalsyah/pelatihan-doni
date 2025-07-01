@@ -154,7 +154,7 @@
                             <!--begin::Input group-->
                             <div class="fv-row mb-7" id="req_name">
                                 <!--begin::Label-->
-                                <label class="required fw-semibold fs-6 mb-2">Full Name</label>
+                                <label class="required fw-semibold fs-6 mb-2">Nama Lengkap</label>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0"
@@ -166,7 +166,7 @@
                             <!--begin::Input group-->
                             <div class="fv-row mb-7" id="req_phone">
                                 <!--begin::Label-->
-                                <label class="required fw-semibold fs-6 mb-2">Phone Number</label>
+                                <label class="required fw-semibold fs-6 mb-2">Nomor Telepon</label>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <input type="text" name="phone" class="form-control form-control-solid mb-3 mb-lg-0"
@@ -175,10 +175,67 @@
                             </div>
                             <!--end::Input group-->
 
+                            <div class="mb-3" id="req_gender">
+                                <label for="register-gender" class="form-label">Jenis Kelamin</label>
+                                <select name="gender" id="gender" class="form-control form-control-solid mb-3 mb-lg-0">
+                                    <option value="">-- Pilih salah satu --</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3" id="req_born_date">
+                                <label for="born_date" class="form-label">Tanggal Lahir</label>
+                                <input type="date" name="born_date" class="form-control form-control-solid mb-3 mb-lg-0" id="register-born_date"
+                                    placeholder="Masukkan tanggal lahir anda" autocomplete="off">
+                            </div>
+
+                            <div class="mb-3" id="req_education_status">
+                                <label for="register-education_status" class="form-label">Status Pendidikan</label>
+                                <select name="education_status" id="education_status" class="form-control form-control-solid mb-3 mb-lg-0">
+                                    <option value="">-- Pilih salah satu --</option>
+                                    <option value="SMA">SMA</option>
+                                    <option value="SMK">SMK</option>
+                                    <option value="Mahasiswa">Mahasiswa</option>
+                                </select>
+                            </div>
+
+                            @if ($vector && $vector->isNotEmpty())
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Minat</label>
+                                    <div class="">
+                                        <select name="id_vector" id="vector" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            <option value="">-- Pilih salah satu --</option>
+                                            @foreach ($vector as $row)
+                                                <option value="{{ $row->id_vector }}">{{ $row->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Pertanyaan 2: Riwayat Program Pelatihan --}}
+                            @if ($training && $training->isNotEmpty())
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Riwayat program pelatihan yang pernah diikuti</label>
+                                    <div class="">
+                                        <select name="id_riwayat_pelatihan" id="riwayat_pelatihan" class="form-control form-control-solid mb-3 mb-lg-0">
+                                            <option value="">-- Pilih salah satu --</option>
+                                            <option value="">Belum Pernah Mengikuti Pelatihan</option>
+                                            @foreach ($training as $row)
+                                                <option value="{{ $row->id_training }}">{{ $row->title }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+
                             <!--begin::Input group-->
                             <div class="fv-row mb-7" id="req_email">
                                 <!--begin::Label-->
-                                <label class="required fw-semibold fs-6 mb-2">Email Address</label>
+                                <label class="required fw-semibold fs-6 mb-2">Alamat Email</label>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <input type="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0"
@@ -203,7 +260,7 @@
                             <!--begin::Input group-->
                             <div class="fv-row mb-7" id="req_repassword">
                                 <!--begin::Label-->
-                                <label class="required password fw-semibold fs-6 mb-2">Password Confirmation</label>
+                                <label class="required password fw-semibold fs-6 mb-2">Konfirmasi password</label>
                                 <!--end::Label-->
                                 <!--begin::Input-->
                                 <input type="password" name="repassword"

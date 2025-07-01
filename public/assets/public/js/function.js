@@ -742,7 +742,7 @@ function preview_embed(element,  url) {
 }
 
 function switching(element, e, id) {
-    // console.log(two);
+    console.log($(element).data('url'));
     var url = $(element).data('url');
     var primary = $(element).data('primary');
     e.preventDefault();
