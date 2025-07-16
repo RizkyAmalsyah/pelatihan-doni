@@ -38,7 +38,7 @@
                     <!--end::Select2-->
                 </div>
                 <!--begin::Add banner-->
-                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_banner"  class="btn btn-primary">Add Banner</a>
+                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_banner"  class="btn btn-primary">Tambah Data Banner</a>
                 <!--end::Add banner-->
             </div>
             <!--end::Card toolbar-->
@@ -53,7 +53,7 @@
                         <th class="min-w-10px pe-2" data-orderable="false" data-searchable="false">No</th>
                         <th class="min-w-200px" data-orderable="false" data-searchable="false">Media</th>
                         <th class="min-w-200px">Judul</th>
-                        <th class="min-w-200px">Description</th>
+                        <th class="min-w-200px">Deskripsi</th>
                         <th class="text-center min-w-100px" data-searchable="false">Status</th>
                         <th class="text-end min-w-70px" data-orderable="false" data-searchable="false">Actions</th>
                     </tr>
@@ -76,7 +76,7 @@
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Banner|Add Banner"></h1>
+                <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Data Banner|Tambah Data Banner"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body mx-5 mx-xl-15 my-7">

@@ -130,7 +130,7 @@
                  <!--begin::Amount-->
                 <div class="fs-1 fw-bold text-dark me-2 lh-1 ls-n2"><i class="fa-solid {{ (salamWaktu()->dark == true) ? 'fa-cloud-moon' : 'fa-cloud-sun' }}"></i> {{ salamWaktu()->message }} <span class="text-primary">{{ session(config('session.prefix') . '_name') }}</span></div>
                 <!--end::Amount-->
-                <span class="text-dark opacity-50 pt-1 mt-3 fw-semibold fs-6">Selamat datang di Website Sistem Manajemen Pelatihan</span>
+                <span class="text-dark opacity-50 pt-1 mt-3 fw-semibold fs-6">Selamat datang di Website Rekomendasi Pelatihan Menggunakan Metode K-Nearest Neighbor (KNN) </span>
                 <!--end::Subtitle-->
             </div>
             <!--end::Card body-->

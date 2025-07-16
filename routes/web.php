@@ -77,6 +77,9 @@ Route::middleware(DashboardRoleAccess::class)->group(function () {
   Route::post('/setting/insert/sosmed', [SettingController::class, 'insert_sosmed'])->name('insert.sosmed');
   Route::post('/setting/update/about', [SettingController::class, 'updateAbout'])->name('update.about');
   Route::post('/setting/update/sosmed', [SettingController::class, 'update_sosmed'])->name('update.sosmed');
+  Route::post('/setting/insert/form', [SettingController::class, 'insert_form'])->name('insert.form');
+  Route::post('/setting/update/form', [SettingController::class, 'update_form'])->name('update.form');
+
   // FORM
   Route::post('/setting/update/form', [SettingController::class, 'update_form'])->name('update.form');
   Route::post('/setting/insert/form', [SettingController::class, 'insert_form'])->name('insert.form');
@@ -84,13 +87,8 @@ Route::middleware(DashboardRoleAccess::class)->group(function () {
 
 
   // DASHBOARD
-  Route::controller(DashboardController::class)->group(function () {
+    Route::controller(DashboardController::class)->group(function () {
     // PROFILE
-    Route::post('/dashboard/updateEmail', 'updateEmail')->name('email.update');
-    Route::post('/dashboard/updatePassword', 'updatePassword')->name('password.update');
-    Route::post('/dashboard/accountDeactivated', 'accountDeactivated')->name('account.deactivated');
-    Route::post('/dashboard/updateProfile', 'updateProfile')->name('admin.profile.update');
-    Route::post('/detail/pengaduan', 'detail_pengaduan')->name('detail.pengaduan');
   });
 
   // DATATABLE

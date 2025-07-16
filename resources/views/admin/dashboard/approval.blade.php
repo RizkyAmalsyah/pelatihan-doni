@@ -41,7 +41,7 @@
                         <th class="min-w-10px pe-2" data-orderable="false" data-searchable="false">No</th>
                         <th class="min-w-150px">Tanggal</th>
                         <th class="min-w-200px">User</th>
-                        <th class="min-w-200px">Training</th>
+                        <th class="min-w-200px">Pelatihan</th>
                         <th class="text-end min-w-70px" data-orderable="false" data-searchable="false">Actions</th>
                     </tr>
                 </thead>

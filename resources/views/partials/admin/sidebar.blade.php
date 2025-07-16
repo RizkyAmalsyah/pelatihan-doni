@@ -8,7 +8,7 @@
     <div class="aside-logo flex-column-auto pt-10 pt-lg-10" id="kt_aside_logo">
         <a href="{{ route('dashboard'); }}">
             @if($setting->icon  && file_exists(public_path('data/setting/' . $setting->icon )))
-                <img alt="Logo" src="{{ asset('data/setting/' . $setting->icon ) }}" class="h-60px" />
+                <img alt="Logo" src="{{ asset('data/setting/' . $setting->icon ) }}" class="h-50px" />
             @endif
         </a>
     </div>
@@ -103,7 +103,7 @@
                                 <span class="menu-icon">
                                     <i class="fa-solid fa-users fs-4"></i>
                                 </span>
-                                <span class="menu-title">Member</span>
+                                <span class="menu-title">User</span>
                             </a>
                             <!--end:Menu link-->
                         </div>
@@ -115,7 +115,7 @@
                                 <span class="menu-icon">
                                     <i class="fa-solid fa-tags fs-4"></i>
                                 </span>
-                                <span class="menu-title">Kategori</span>
+                                <span class="menu-title">Kategori Pelatihan</span>
                             </a>
                             <!--end:Menu link-->
                         </div>
@@ -127,7 +127,7 @@
                                 <span class="menu-icon">
                                     <i class="fa-solid fa-thumbs-up fs-4"></i>
                                 </span>
-                                <span class="menu-title">Vector</span>
+                                <span class="menu-title">Minat</span>
                             </a>
                             <!--end:Menu link-->
                         </div>

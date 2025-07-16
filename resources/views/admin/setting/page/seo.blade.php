@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <div class="row mb-6">
+    <!-- <div class="row mb-6">
         <label for="meta_author" class="col-lg-4 col-form-label required fw-semibold fs-6">Nama Author</label>
         <div class="col-lg-8">
             <div class="row">
@@ -21,7 +21,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row mb-6">
         <label class="col-lg-4 col-form-label fw-semibold fs-6">Nomor Telepon</label>
@@ -97,7 +97,7 @@
         </div>
     </div>
 
-    <div class="row mb-6">
+    <!-- <div class="row mb-6">
         <label for="meta_keyword_website" class="col-lg-4 col-form-label fw-semibold fs-6">Kata Kunci Pencarian</label>
         <div class="col-lg-8">
             <div class="row">
@@ -106,7 +106,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row mb-6">
         <label for="meta_address" class="col-lg-4 col-form-label fw-semibold fs-6">Alamat</label>
@@ -119,7 +119,7 @@
         </div>
     </div>
 
-    <div class="row mb-6">
+    <!-- <div class="row mb-6">
         <label for="meta_description" class="col-lg-4 col-form-label fw-semibold fs-6">Deskripsi Singkat Website</label>
         <div class="col-lg-8">
             <div class="row">
@@ -128,7 +128,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="row w-100">
         <div class="col-12 w-100 d-flex justify-content-center">

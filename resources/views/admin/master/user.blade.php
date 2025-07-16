@@ -41,7 +41,7 @@
                     </div>
                     <!--begin::Add user-->
                     <a role="button" onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_user"
-                        class="btn btn-primary">Add User</a>
+                        class="btn btn-primary">Tambah User</a>
                     <!--end::Add user-->
                 </div>
                 <!--end::Card toolbar-->

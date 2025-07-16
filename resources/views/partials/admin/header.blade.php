@@ -42,10 +42,10 @@
         </div>
         <!--end::Page title=-->
         
-        <!--begin::Wrapper-->
-        <div class="d-flex align-items-center flex-wrap">
+        <!-- begin::Wrapper-->
+        <!-- <div class="d-flex align-items-center flex-wrap">
             <!--begin::Action-->
-            <div class="d-flex align-items-center py-3 py-lg-0">
+            <!-- <div class="d-flex align-items-center py-3 py-lg-0">
                     <a href="{{ route('admin.profile'); }}" style="width: 55px !important; height: 55px !important; 
                         background-image: url('{{ image_check(session(config('session.prefix') . '_image'), 'user','user') }}'); 
                         background-position: center; 
@@ -54,10 +54,10 @@
                         border-radius : 100%;
                         ">
                     </a>
-            </div>
+            </div> -->
             <!--end::Action-->
-        </div>
-        <!--end::Wrapper-->
+        <!-- </div> --> -->
+        <!--end::Wrapper -->
     </div>
     <!--end::Container-->
     <div class="header-offset"></div>

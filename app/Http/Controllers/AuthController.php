@@ -98,7 +98,12 @@ class AuthController extends Controller
     }
 
     $arrVar = [
+
+
       'name' => 'Nama',
+      'born_date' => 'Tanggal Lahir',
+      'education_status' => 'Status Pendidikan',
+      'gender' => 'Jenis Kelamin',
       'email' => 'Alamat email',
       'phone' => 'Nomor telepon',
       'password' => 'Kata sandi',
@@ -271,7 +276,7 @@ class AuthController extends Controller
     return now()->diffInYears(Carbon::parse($born_date));
   }
 
-  public function knnPredictCategory($userInput, $k = 3)
+ public function knnPredictCategory($userInput, $k = 3)
   {
     $allUsers = User::whereNotNull('id_category')->where('deleted', 'N')->get();
 

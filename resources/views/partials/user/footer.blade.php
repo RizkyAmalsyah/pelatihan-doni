@@ -65,41 +65,14 @@
                     <h4 class="widget-title text-white mb-3">Menu</h4>
                     <ul class="list-unstyled  mb-0">
                         <li><a class="scrollto" href="{{ route('home') }}#home">Home</a></li>
-                        <li><a class="scrollto" href="{{ route('home') }}#about">Tentang Kami</a></li>
-                        <li><a class="scrollto" href="{{ route('home') }}#contact">Hubungi Kami</a></li>
+                        <li><a class="scrollto" href="{{ route('home') }}#about">Tentang </a></li>
+                        <li><a class="scrollto" href="{{ route('home') }}#contact">Hubungi kami</a></li>
                     </ul>
                 </div>
                 <!-- /.widget -->
             </div>
             <!-- /column -->
-            <div class="col-md-12 col-lg-3">
-                <div class="widget">
-                    <h4 class="widget-title text-white mb-3">Newsletter</h4>
-                    <p class="mb-5">Mari berkenalan dan berhubungan baik dengan kami</p>
-                    <div class="newsletter-wrapper">
-                        <!-- Begin Mailchimp Signup Form -->
-                        <div id="mc_embed_signup2">
-                            <form id="form_subscribe" action="{{ route('subscribe.insert') }}" method="post"
-                                class="validate dark-fields" novalidate>
-                                <div id="req_subscribe_email">
-                                    <div class="mc-field-group input-group form-floating">
-                                        <input type="email" name="email" class="required email form-control"
-                                            placeholder="Alamat Email" id="email-subscribe" autocomplete="off">
-                                        <label for="email-subscribe">Alamat Email</label>
-                                        <button class="btn btn-primary" id="button_subscribe" type="button"
-                                            onclick="submit_form(this,'#form_subscribe', '', false, false,`<div class='spinner-border text-light' role='status'></div>`)">
-                                            <i class="fa-solid fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <!--End mc_embed_signup-->
-                    </div>
-                    <!-- /.newsletter-wrapper -->
-                </div>
-                <!-- /.widget -->
-            </div>
+           
             <!-- /column -->
         </div>
         <!--/.row -->
@@ -239,7 +212,7 @@
 
                     <div id="pane_vector" class="d-none">
                         <div class="mb-3 text-center">
-                            <h2 class="form-label">Isi preferensi anda</h2>
+                            <h2 class="text-blue-950 form-label">Isi preferensi anda</h2>
                         </div>
 
                         {{-- Pertanyaan 1: Minat --}}
@@ -278,11 +251,11 @@
 
                         {{-- Tombol --}}
                         <div class="w-100 d-flex row">
-                            <div class="col-md-6 d-flex justify-content-center align-items-center mb-2">
+                            <!-- <div class="col-md-6 d-flex justify-content-center align-items-center mb-2">
                                 <button role="button" id="cancel_register" onclick="cancel_register()"
                                     class="btn btn-secondary w-100 text-white rounded-3 shadow-sm hover-shadow">Kembali</button>
-                            </div>
-                            <div class="col-md-6 d-flex justify-content-center align-items-center mb-2">
+                            </div> -->
+                            <div class="justify-content-center align-items-center mb-2">
                                 <button role="button" id="button_register"
                                     onclick="submit_form(this,'#formRegister')"
                                     class="btn btn-primary w-100 text-white rounded-3 shadow-sm hover-shadow">Daftar</button>

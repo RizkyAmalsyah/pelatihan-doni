@@ -82,7 +82,7 @@
             <!-- /.navbar-collapse -->
             <div class="navbar-other ms-lg-4">
                 <ul class="navbar-nav flex-row align-items-center ms-auto">
-                    <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-search"><i class="uil uil-search"></i></a></li>
+                    <!-- <li class="nav-item"><a class="nav-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-search"><i class="uil uil-search"></i></a></li> -->
                     @if(!session(config('session.prefix') . '_id_user'))
                     <li class="nav-item d-none d-md-block">
                         <button data-bs-target="#modalLogin" data-bs-toggle="modal" class="btn btn-sm btn-primary rounded-pill">Login</button>
@@ -107,13 +107,13 @@
 </header>
 <!-- /header -->
 
-<div class="offcanvas offcanvas-top bg-light" id="offcanvas-search" data-bs-scroll="true">
-<div class="container d-flex flex-row py-6">
+<!-- <div class="offcanvas offcanvas-top bg-light" id="offcanvas-search" data-bs-scroll="true"> -->
+<!-- <div class="container d-flex flex-row py-6">
     <form method="GET" action="{{ route('training') }}" class="search-form w-100">
     <input id="search-form" name="search" type="text" class="form-control" placeholder="Masukkan kata kunci">
     </form>
     <!-- /.search-form -->
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-</div>
+    <!-- <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div> -->
 <!-- /.container -->
 </div>

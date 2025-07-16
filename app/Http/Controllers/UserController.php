@@ -67,7 +67,7 @@ class UserController extends Controller
 
     return view('user.index', $data);
   }
-
+  
   public function training(Request $request)
   {
     // Variabel dasar

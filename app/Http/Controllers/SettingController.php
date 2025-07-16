@@ -26,8 +26,8 @@ class SettingController extends Controller
         $data = [];
 
         // GLBL
-        $data['title'] = 'setting';
-        $data['subtitle'] = 'setting lanjutan website';
+        $data['title'] = 'Setting';
+        $data['subtitle'] = 'Setting Lanjutan Website';
 
         // GET DATA
         $setting = Setting::find(1); // get_single
@@ -171,7 +171,6 @@ class SettingController extends Controller
     {
         $arrVar = [
             'meta_title' => 'Judul website',
-            'meta_author' => 'Nama author'
         ];
 
         $arrAccess = [];
@@ -190,20 +189,20 @@ class SettingController extends Controller
         }
 
         // META KEYWORD
-        $metaKeywordRaw = $request->input('meta_keyword', '');
-        if ($metaKeywordRaw) {
-            $decoded = json_decode($metaKeywordRaw, true);
-            $cleaned = [];
-            foreach ($decoded as $item) {
-                $val = str_replace(["'", '"', "`"], "", $item['value']);
-                $cleaned[] = $val;
-            }
-            $post['meta_keyword'] = implode(',', $cleaned);
-        } else {
-            $post['meta_keyword'] = '';
-        }
+        // $metaKeywordRaw = $request->input('meta_keyword', '');
+        // if ($metaKeywordRaw) {
+        //     $decoded = json_decode($metaKeywordRaw, true);
+        //     $cleaned = [];
+        //     foreach ($decoded as $item) {
+        //         $val = str_replace(["'", '"', "`"], "", $item['value']);
+        //         $cleaned[] = $val;
+        //     }
+        //     $post['meta_keyword'] = implode(',', $cleaned);
+        // } else {
+        //     $post['meta_keyword'] = '';
+        // }
 
-        $post['meta_description'] = $request->input('meta_description', '');
+        
         $post['meta_address'] = $request->input('meta_address', '');
 
         // PHONE
@@ -294,13 +293,13 @@ class SettingController extends Controller
         if ($update) {
             return response()->json([
                 'status' => true,
-                'alert' => ['message' => 'CMS About updated'],
+                'alert' => ['message' => 'Data Berhasil Disimpan!'],
                 'reload' => true
             ]);
         } else {
             return response()->json([
                 'status' => false,
-                'alert' => ['message' => 'CMS About failed updated']
+                'alert' => ['message' => 'Gagal Menyimpan Data']
             ]);
         }
     }
@@ -456,49 +455,41 @@ class SettingController extends Controller
     }
 
     // // FORM
-    public function insert_form(Request $request)
-    {
-        $arrVar = [
-            'field' => 'Field',
-            'type' => 'Type'
-        ];
+   public function insert_form(Request $request)
+{
+    $field = $request->input('field');
+    $type = $request->input('type');
 
-        $post = [];
-        $arrAccess = [];
-        $data = [];
-
-        foreach ($arrVar as $var => $value) {
-            $$var = $request->input($var);
-            if (!$$var) {
-                $data['required'][] = ['req_' . $var, "$value cannot be empty!"];
-                $arrAccess[] = false;
-            } else {
-                $post[$var] = trim($$var);
-                $arrAccess[] = true;
-            }
-        }
-
-        if (in_array(false, $arrAccess)) {
-            return response()->json(['status' => false, 'required' => $data['required']]);
-        }
-
-        $insert = Form::create($post);
-
-        if ($insert) {
-            return response()->json([
-                'status' => true,
-                'alert' => ['message' => 'Data added successfully!'],
-                'datatable' => 'table_form',
-                'modal' => ['id' => '#kt_modal_form', 'action' => 'hide'],
-                'input' => ['all' => true]
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'alert' => ['message' => 'Failed to add data!']
-            ]);
-        }
+    if (!$field || !$type) {
+        return response()->json([
+            'status' => false,
+            'alert' => 'Field dan Type wajib diisi!',
+        ]);
     }
+
+    // Hitung urutan paling besar
+    $urutan = Form::where('deleted', 'N')->max('urutan') ?? 0;
+
+    // Tambahkan data baru di paling bawah
+    $form = new Form();
+    $form->field = $field;
+    $form->type = $type;
+    $form->urutan = $urutan + 1; // Otomatis nomor berikutnya
+    $form->deleted = 'N';
+    $form->save();
+
+    return response()->json([
+        'status' => true,
+        'alert' => 'Formulir berhasil ditambahkan',
+        'datatable' => 'table_form',
+        'modal' => '#kt_modal_form',
+        'input' => '#form_form'
+    ]);
+}
+
+
+
+
 
     public function update_form(Request $request)
     {
@@ -759,54 +750,5 @@ class SettingController extends Controller
         }
     }
 
-    public function export(Request $request)
-    {
-        $db = $request->input('db');
-        $primary = $request->input('primary') ?? "id_{$db}";
-        $type = $request->input('type') ?? 'excel';
-
-        // Check if the table exists
-        if (!DB::getSchemaBuilder()->hasTable($db)) {
-            return response()->json([
-                'status' => 500,
-                'alert' => [
-                    'message' => 'Table not found!'
-                ]
-            ]);
-        }
-
-        // Check if the table has data
-        $data = DB::table($db)->get();
-
-        if ($data->isEmpty()) {
-            return response()->json([
-                'status' => 500,
-                'alert' => [
-                    'message' => 'No data available to export!'
-                ]
-            ]);
-        }
-
-        try {
-            // You can customize the export logic here
-            $filename = $db . '_export_' . now()->format('Ymd_His') . '.' . ($type === 'pdf' ? 'pdf' : 'xlsx');
-
-            if ($type == 'pdf') {
-                // Example PDF export logic (using dompdf/snappy/etc)
-                $pdf = PDF::loadView("exports.{$db}", compact('data'));
-                return $pdf->download($filename);
-            } else {
-                // Example Excel export (using maatwebsite/excel)
-                return Excel::download(new GenericExport($db, $data), $filename);
-            }
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'alert' => [
-                    'message' => 'Export failed! ' . $e->getMessage()
-                ]
-            ]);
-        }
-    }
+    
 }

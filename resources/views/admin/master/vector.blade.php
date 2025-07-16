@@ -39,7 +39,7 @@
                     <!--end::Select2-->
                 </div>
                 <!--begin::Add vector-->
-                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_vector"  class="btn btn-primary">Add Vector</a>
+                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_vector"  class="btn btn-primary">Tambah Minat</a>
                 <!--end::Add vector-->
             </div>
             <!--end::Card toolbar-->
@@ -52,7 +52,7 @@
                 <thead>
                     <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
                         <th class="min-w-10px pe-2" data-orderable="false" data-searchable="false">No</th>
-                        <th class="min-w-200px">Vector</th>
+                        <th class="min-w-200px">Minat</th>
                         <th class="text-center min-w-100px" data-searchable="false">Status</th>
                         <th class="text-end min-w-70px" data-orderable="false" data-searchable="false">Actions</th>
                     </tr>
@@ -75,7 +75,7 @@
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Vector|Add Vector"></h1>
+                <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Minat|Add Minat"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body mx-5 mx-xl-15 my-7">
@@ -88,7 +88,7 @@
                         <!--begin::Input group-->
                         <div class="fv-row mb-7" id="req_name">
                             <!--begin::Label-->
-                            <label class="required fw-semibold fs-6 mb-2">Vector</label>
+                            <label class="required fw-semibold fs-6 mb-2">Minat</label>
                             <!--end::Label-->
                             <!--begin::Input-->
                             <input type="text" name="name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Enter Vector" autocomplete="off" />

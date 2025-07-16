@@ -17,6 +17,7 @@ use App\Models\Training;
 use App\Models\TrainingVector;
 use App\Models\RegisTraining;
 use App\Models\Banner;
+use App\Models\Form;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -37,7 +38,7 @@ class MasterController extends Controller
   {
     // SET TITLE
     $data['title'] = 'Master Admins';
-    $data['subtitle'] = 'Admins management';
+    $data['subtitle'] = 'Admins Management';
 
     return view('admin.master.admin', $data);
   }
@@ -45,8 +46,8 @@ class MasterController extends Controller
   public function category()
   {
     // SET TITLE
-    $data['title'] = 'Master Category';
-    $data['subtitle'] = 'Category management';
+    $data['title'] = 'Master Kategori';
+    $data['subtitle'] = 'Kategori Management';
 
     return view('admin.master.category', $data);
   }
@@ -55,8 +56,8 @@ class MasterController extends Controller
   public function vector()
   {
     // SET TITLE
-    $data['title'] = 'Master Vector';
-    $data['subtitle'] = 'Vector management';
+    $data['title'] = 'Master Minat';
+    $data['subtitle'] = 'Minat Management';
 
     return view('admin.master.vector', $data);
   }
@@ -66,7 +67,7 @@ class MasterController extends Controller
   {
     // SET TITLE
     $data['title'] = 'Master Training';
-    $data['subtitle'] = 'Training management';
+    $data['subtitle'] = 'Training Management';
 
     // GET DATA
     $category = Category::where('status', 'Y')->get();
@@ -83,7 +84,7 @@ class MasterController extends Controller
   {
     // SET TITLE
     $data['title'] = 'Master Banner';
-    $data['subtitle'] = 'Banner management';
+    $data['subtitle'] = 'Banner Management';
 
     return view('admin.master.banner', $data);
   }
@@ -234,50 +235,85 @@ class MasterController extends Controller
     return now()->diffInYears(Carbon::parse($born_date));
   }
 
-  public function knnPredictCategory($userInput, $k = 3)
-  {
+   public function knnPredictCategory($userInput, $k = 5)
+{
+    // Ambil semua data user lama yang memiliki kategori
     $allUsers = User::whereNotNull('id_category')->where('deleted', 'N')->get();
 
-    $distances = [];
+    // Hitung nilai minimum dan maksimum dari setiap fitur numerik
+    $minMax = [
+        'umur' => ['min' => PHP_INT_MAX, 'max' => PHP_INT_MIN],
+        'vector' => ['min' => PHP_INT_MAX, 'max' => PHP_INT_MIN],
+        'riwayat' => ['min' => PHP_INT_MAX, 'max' => PHP_INT_MIN],
+    ];
 
-    $umurBaru = $this->getAge($userInput['born_date']);
-    $genderBaru = $userInput['gender'] === 'Laki-laki' ? 1 : 0;
-    $eduMap = ['SMA' => 0, 'SMK' => 1, 'Mahasiswa' => 2];
-    $eduBaru = $eduMap[$userInput['education_status']] ?? 0;
-    $vectorBaru = (int) $userInput['id_vector'];
-    $riwayatBaru = isset($userInput['id_riwayat_pelatihan']) ? (int) $userInput['id_riwayat_pelatihan'] : 0;
+    foreach ($allUsers as $user) {
+        $umur = $this->getAge($user->born_date);
+        $vector = (int) $user->id_vector ?? 0;
+        $riwayat = (int) $user->id_riwayat_pelatihan ?? 0;
 
-    foreach ($allUsers as $oldUser) {
-      $umurLama = $this->getAge($oldUser->born_date);
-      $genderLama = $oldUser->gender === 'Laki-laki' ? 1 : 0;
-      $eduLama = $eduMap[$oldUser->education_status] ?? 0;
-      $vectorLama = (int) $oldUser->id_vector ?? 0;
-      $riwayatLama = (int) $oldUser->id_riwayat_pelatihan ?? 0;
-
-      $dist = sqrt(
-        pow($umurBaru - $umurLama, 2) +
-          pow($genderBaru - $genderLama, 2) +
-          pow($eduBaru - $eduLama, 2) +
-          pow($vectorBaru - $vectorLama, 2) +
-          pow($riwayatBaru - $riwayatLama, 2)
-      );
-
-      $distances[] = ['distance' => $dist, 'category' => $oldUser->id_category];
+        $minMax['umur']['min'] = min($minMax['umur']['min'], $umur);
+        $minMax['umur']['max'] = max($minMax['umur']['max'], $umur);
+        $minMax['vector']['min'] = min($minMax['vector']['min'], $vector);
+        $minMax['vector']['max'] = max($minMax['vector']['max'], $vector);
+        $minMax['riwayat']['min'] = min($minMax['riwayat']['min'], $riwayat);
+        $minMax['riwayat']['max'] = max($minMax['riwayat']['max'], $riwayat);
     }
 
-    // Urutkan jarak terpendek
+    // Fungsi bantu untuk normalisasi
+    $normalize = function ($value, $min, $max) {
+        return ($max - $min) == 0 ? 0 : ($value - $min) / ($max - $min);
+    };
+
+    // Normalisasi data input baru
+    $umurBaru = $this->getAge($userInput['born_date']);
+    $umurBaru = $normalize($umurBaru, $minMax['umur']['min'], $minMax['umur']['max']);
+
+    $genderBaru = $userInput['gender'] === 'Laki-laki' ? 1 : 0;
+
+    $eduMap = ['SMA' => 0, 'SMK' => 1, 'Mahasiswa' => 2];
+    $eduBaru = $eduMap[$userInput['education_status']] ?? 0;
+
+    $vectorBaru = $normalize((int) $userInput['id_vector'], $minMax['vector']['min'], $minMax['vector']['max']);
+
+    $riwayatBaru = isset($userInput['id_riwayat_pelatihan']) 
+        ? $normalize((int) $userInput['id_riwayat_pelatihan'], $minMax['riwayat']['min'], $minMax['riwayat']['max']) 
+        : 0;
+
+    // Proses perhitungan jarak
+    $distances = [];
+
+    foreach ($allUsers as $oldUser) {
+        $umurLama = $normalize($this->getAge($oldUser->born_date), $minMax['umur']['min'], $minMax['umur']['max']);
+        $genderLama = $oldUser->gender === 'Laki-laki' ? 1 : 0;
+        $eduLama = $eduMap[$oldUser->education_status] ?? 0;
+        $vectorLama = $normalize((int) $oldUser->id_vector ?? 0, $minMax['vector']['min'], $minMax['vector']['max']);
+        $riwayatLama = $normalize((int) $oldUser->id_riwayat_pelatihan ?? 0, $minMax['riwayat']['min'], $minMax['riwayat']['max']);
+
+        $dist = sqrt(
+            pow($umurBaru - $umurLama, 2) +
+            pow($genderBaru - $genderLama, 2) +
+            pow($eduBaru - $eduLama, 2) +
+            pow($vectorBaru - $vectorLama, 2) +
+            pow($riwayatBaru - $riwayatLama, 2)
+        );
+
+        $distances[] = ['distance' => $dist, 'category' => $oldUser->id_category];
+    }
+
+    // Urutkan dari jarak terpendek
     usort($distances, fn($a, $b) => $a['distance'] <=> $b['distance']);
 
     // Ambil k tetangga terdekat
     $topK = array_slice($distances, 0, $k);
 
-    // Hitung mayoritas kategori
+    // Hitung voting mayoritas
     $counts = array_count_values(array_column($topK, 'category'));
 
-    // Ambil id_category yang paling banyak muncul
+    // Kembalikan kategori dengan jumlah terbanyak
     arsort($counts);
     return array_key_first($counts);
-  }
+}
 
   public function update_user(Request $request)
   {
@@ -1031,4 +1067,107 @@ class MasterController extends Controller
 
     return response()->json(['status' => false]);
   }
+
+  // // FORM
+    public function insert_form(Request $request)
+    {
+        $arrVar = [
+            'field' => 'Field',
+            'type' => 'Type'
+        ];
+
+        $post = [];
+        $arrAccess = [];
+        $data = [];
+
+        foreach ($arrVar as $var => $value) {
+            $$var = $request->input($var);
+            if (!$$var) {
+                $data['required'][] = ['req_' . $var, "$value cannot be empty!"];
+                $arrAccess[] = false;
+            } else {
+                $post[$var] = trim($$var);
+                $arrAccess[] = true;
+            }
+        }
+
+        if (in_array(false, $arrAccess)) {
+            return response()->json(['status' => false, 'required' => $data['required']]);
+        }
+
+        $insert = Form::create($post);
+
+        if ($insert) {
+            return response()->json([
+                'status' => true,
+                'alert' => ['message' => 'Data Berhasil Ditambahkan'],
+                'datatable' => 'table_form',
+                'modal' => ['id' => '#kt_modal_form', 'action' => 'hide'],
+                'input' => ['all' => true]
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'alert' => ['message' => 'Failed to add data!']
+            ]);
+        }
+    }
+
+    public function update_form(Request $request)
+    {
+        $id = $request->id_form;
+        $form = Form::where('id_form', $id)->where('deleted', 'N')->first();
+
+        if (!$form) {
+            return response()->json([
+                'status' => false,
+                'alert' => ['message' => 'Form not found!']
+            ]);
+        }
+
+        $arrVar = [
+            'field' => 'Field',
+            'type' => 'Type'
+        ];
+
+        $post = [];
+        $arrAccess = [];
+        $data = [];
+
+        foreach ($arrVar as $var => $value) {
+            $$var = $request->input($var);
+            if (!$$var) {
+                $data['required'][] = ['req_' . $var, "$value cannot be empty!"];
+                $arrAccess[] = false;
+            } else {
+                $post[$var] = trim($$var);
+                $arrAccess[] = true;
+            }
+        }
+
+        if (in_array(false, $arrAccess)) {
+            return response()->json(['status' => false, 'required' => $data['required']]);
+        }
+
+        $update = $form->update($post);
+
+        if ($update) {
+            return response()->json([
+                'status' => true,
+                'alert' => ['message' => 'updated successfully!'],
+                'datatable' => 'table_form',
+                'modal' => ['id' => '#kt_modal_form', 'action' => 'hide'],
+                'input' => ['all' => true]
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'alert' => ['message' => 'Failed to update!']
+            ]);
+        }
+        
+
+        return response()->json(['status' => false]);
+    }
+
 }

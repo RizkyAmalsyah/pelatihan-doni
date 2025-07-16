@@ -19,7 +19,6 @@ use App\Models\Category;
 use App\Models\Form;
 use App\Models\Vector;
 use App\Models\Training;
-use App\Models\TrainingVector;
 use App\Models\Banner;
 use App\Models\RegisTraining;
 use Illuminate\Support\Facades\Log;
@@ -369,10 +368,10 @@ class TableManagement extends Controller
       if ($item->status == 'Y') {
         $checked = 'checked';
       }
-      $status = '';
-      $status .= '<div class="d-flex justify-content-center align-items-center">';
-      $status .= '<div class="form-check form-switch"><input onchange="switching(this,event,' . $item->id_contact . ')" data-primary="id_contact"  data-url="' . url('switch/contacts') . '" class="form-check-input cursor-pointer focus-info" type="checkbox" role="switch" id="switch-' . $item->id_contact . '" ' . $checked . '></div>';
-      $status .= '</div>';
+      // $status = '';
+      // $status .= '<div class="d-flex justify-content-center align-items-center">';
+      // $status .= '<div class="form-check form-switch"><input onchange="switching(this,event,' . $item->id_contact . ')" data-primary="id_contact"  data-url="' . url('switch/contacts') . '" class="form-check-input cursor-pointer focus-info" type="checkbox" role="switch" id="switch-' . $item->id_contact . '" ' . $checked . '></div>';
+      // $status .= '</div>';
       // ACTION
       $action = '';
       $action .= '<div class="d-flex justify-content-end flex-shrink-0">
@@ -386,7 +385,7 @@ class TableManagement extends Controller
         $item->name,
         $item->email,
         $item->message,
-        $status,
+        // $status,
         $action
       ];
     }
@@ -686,7 +685,7 @@ class TableManagement extends Controller
     ];
 
     // Query utama: join ke kategori dan hitung jumlah pendaftar
-    $query = Training::with(['category', 'trainingVectors.vector'])
+    $query = Training::with(['category'])
       ->withCount('registrations')
       ->join('categories', 'categories.id_category', '=', 'trainings.id_category')
       ->select('trainings.*', 'categories.name as category_name', DB::raw('(select count(*) from regis_trainings where regis_trainings.id_training = trainings.id_training AND regis_trainings.approved = "Y") as registrations_count'));
@@ -730,14 +729,14 @@ class TableManagement extends Controller
       $image .= '</div>';
 
       // VECTOR LIST
-      $list = '';
-      if ($item->trainingVectors->isNotEmpty()) {
-        $list .= '<div class="d-flex flex-column text-gray-600">';
-        foreach ($item->trainingVectors as $key) {
-          $list .= '<div class="d-flex align-items-center py-2"><span class="bullet bg-primary me-3"></span>' . $key->vector->name . '</div>';
-        }
-        $list .= '</div>';
-      }
+      // $list = '';
+      // if ($item->trainingVectors->isNotEmpty()) {
+      //   $list .= '<div class="d-flex flex-column text-gray-600">';
+      //   foreach ($item->trainingVectors as $key) {
+      //     $list .= '<div class="d-flex align-items-center py-2"><span class="bullet bg-primary me-3"></span>' . $key->vector->name . '</div>';
+      //   }
+      //   $list .= '</div>';
+      // }
 
       // STATUS
       $checked = $item->status === 'Y' ? 'checked' : '';
@@ -760,8 +759,8 @@ class TableManagement extends Controller
         $image,
         $item->title,
         '<span class="badge badge-primary">' . $item->category->name . '</span>',
-        '<span class="badge badge-info cursor-pointer" data-title="' . $item->title . '" onclick="detail_register(this,' . $item->id_training . ')" data-bs-toggle="modal" data-bs-target="#kt_modal_register">' . $item->registrations_count . ' Member' ?? '0 Member' . '</span>',
-        $list,
+        '<span class="badge badge-info cursor-pointer" data-title="' . $item->title . '" onclick="detail_register(this,' . $item->id_training . ')" data-bs-toggle="modal" data-bs-target="#kt_modal_register">' . $item->registrations_count . ' Peserta' ?? '0 Member' . '</span>',
+
         $status,
         $action
       ];
@@ -862,38 +861,38 @@ class TableManagement extends Controller
     ]);
   }
 
-  public function table_form(Request $request)
-  {
+  public function table_form(Request $request){
     $search = $request->search['value'] ?? '';
     $start = (int)($request->start ?? 0);
     $length = (int)($request->length ?? 10);
     $orderColumn = $request->order[0]['column'] ?? null;
     $orderDir = $request->order[0]['dir'] ?? 'asc';
-    $today = Carbon::today()->toDateString();
     $prefix = config('session.prefix');
-    $id_user = session($prefix . '_id_user');
+    $id_user = session($prefix.'_id_user');
 
     // Kolom mapping sesuai urutan di frontend DataTables
     $columns = [
-      'forms.urutan',
-      'forms.field',
-      'forms.type',
+        null,               // NO (otomatis)
+        'forms.field',      // FIELD
+        'forms.type',       // TYPE
     ];
 
-    $query = Form::where('deleted', 'N');
+    $query = Form::where('deleted','N');
+
     // Search
     if (!empty($search)) {
-      $query->where(function ($q) use ($search) {
-        $q->where('forms.field', 'like', "%{$search}%");
-      });
+        $query->where(function ($q) use ($search) {
+            $q->where('forms.field', 'like', "%{$search}%");
+        });
     }
 
     // Sorting
     if ($orderColumn !== null && isset($columns[$orderColumn])) {
-      $query->orderBy($columns[$orderColumn], $orderDir);
+        $query->orderBy($columns[$orderColumn], $orderDir);
     } else {
-      $query->orderBy('forms.urutan', 'ASC'); // Default sorting
+        $query->orderBy('forms.created_at', 'desc');
     }
+
     // Total record
     $totalRecords = $query->count();
 
@@ -903,37 +902,37 @@ class TableManagement extends Controller
 
     // Format output
     $result = [];
+    $no = $start + 1;
+
     foreach ($data as $item) {
-      // ACTION
-      $action = '';
-      $action .= '<div class="d-flex justify-content-end flex-shrink-0">
-                            <button type="button" class="btn btn-icon btn-warning btn-sm me-1" title="Update" onclick="ubah_form(this,' . $item->id_form . ')" data-bs-toggle="modal" data-bs-target="#kt_modal_form">
-                                <i class="ki-outline ki-pencil fs-2"></i>
-                            </button>
-                            <button type="button" onclick="hapus_data(this,event,' . $item->id_form . ',`forms`,`id_form`)" data-datatable="table_form" class="btn btn-icon btn-danger btn-sm" title="Delete">
-                                <i class="ki-outline ki-trash fs-2"></i>
-                            </button>
-                        </div>';
+        // ACTION
+        $action = '<div class="d-flex justify-content-end flex-shrink-0">
+            <button type="button" class="btn btn-icon btn-warning btn-sm me-1" title="Update" onclick="ubah_form(this,'.$item->id_form.')" data-bs-toggle="modal" data-bs-target="#kt_modal_form">
+                <i class="ki-outline ki-pencil fs-2"></i>
+            </button>
+            <button type="button" onclick="hapus_data(this,event,'.$item->id_form.',`forms`,`id_form`)" data-datatable="table_form" class="btn btn-icon btn-danger btn-sm" title="Delete">
+                <i class="ki-outline ki-trash fs-2"></i>
+            </button>
+        </div>';
 
-
-      $result[] = [
-        'id' => $item->id_form,
-        $item->urutan,
-        $item->field,
-        set_form_type($item->type),
-        $action
-      ];
+        $result[] = [
+            $no++, // urutan otomatis
+            $item->field,
+            set_form_type($item->type),
+            $action
+        ];
     }
 
     $return = [
-      'draw' => intval($request->draw),
-      'recordsTotal' => $totalRecords,
-      'recordsFiltered' => $totalRecords,
-      'data' => $result // langsung isi array row di sini
+        'draw' => intval($request->draw),
+        'recordsTotal' => $totalRecords,
+        'recordsFiltered' => $totalRecords,
+        'data' => $result
     ];
 
     return response()->json($return);
-  }
+}
+
 
 
   public function table_order_form(Request $request)

@@ -174,8 +174,8 @@ let formTable;
 document.addEventListener('DOMContentLoaded', function () {
 
     formTable = initGlobalDatatable('#table_form',null, {
-        enableRowReorder: true,
-        rowReorderDataSrc: 0,
+        // enableRowReorder: true,
+        // rowReorderDataSrc: 0,
     });
 
     // Trigger reload on each filter

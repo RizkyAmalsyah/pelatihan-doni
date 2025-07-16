@@ -38,7 +38,7 @@
                     <!--end::Select2-->
                 </div>
                 <!--begin::Add admin-->
-                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_admin"  class="btn btn-primary">Add Admin</a>
+                <a role="button"  onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_admin"  class="btn btn-primary">Tambah Admin</a>
                 <!--end::Add admin-->
             </div>
             <!--end::Card toolbar-->

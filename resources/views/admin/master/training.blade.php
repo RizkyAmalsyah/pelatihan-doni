@@ -54,7 +54,7 @@
                     </div>
                     <!--begin::Add training-->
                     <a role="button" onclick="tambah_data()" data-bs-toggle="modal" data-bs-target="#kt_modal_training"
-                        class="btn btn-primary">Add Data Training</a>
+                        class="btn btn-primary">Tambah Data Pelatihan</a>
                     <!--end::Add training-->
                 </div>
                 <!--end::Card toolbar-->
@@ -72,7 +72,6 @@
                             <th class="min-w-200px">Judul</th>
                             <th class="min-w-100px">Kategori</th>
                             <th class="min-w-100px">Jumlah Pendaftar</th>
-                            <th class="min-w-200px" data-orderable="false" data-searchable="false">Vector</th>
                             <th class="text-center min-w-100px" data-searchable="false">Status</th>
                             <th class="text-end min-w-70px" data-orderable="false" data-searchable="false">Actions</th>
                         </tr>
@@ -95,7 +94,7 @@
         <div class="modal-dialog modal-dialog-centered mw-650px">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Training|Add Training"></h1>
+                    <h1 class="modal-title fs-5" id="title_modal" data-title="Edit Pelatihan|Tambah Pelatihan"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
                 <div class="modal-body mx-5 mx-xl-15 my-7">
@@ -216,27 +215,7 @@
                             </div>
                             <!--end::Input group-->
 
-                            <div class="row w-100">
-                                <!--begin::Label-->
-                                <label class="fw-semibold fs-6 mb-2">Pilih Dimensi Vector</label>
-                                <!--end::Label-->
-                                @if ($vector)
-                                    @foreach ($vector as $row)
-                                        <div class="col-md-4 col-sm-12 my-3">
-                                            <div class="form-check">
-                                                <input class="cursor-pointer form-check-input checkbox-setup"
-                                                    name="vector[]" type="checkbox" value="{{ $row->id_vector }}"
-                                                    id="vector-{{ $row->id_vector }}" />
-                                                <label class="cursor-pointer form-check-label"
-                                                    for="vector-{{ $row->id_vector }}">
-                                                    {{ $row->name }}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @endif
-
-                            </div>
+                            
                         </div>
                         <!--end::Scroll-->
                         <!--begin::Actions-->
